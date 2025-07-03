@@ -10,6 +10,6 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
         : base(options) { }
 
     public DbSet<WorkItemDefinition> WorkItemDefinitions => Set<WorkItemDefinition>();
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         => base.SaveChangesAsync(cancellationToken);
 }
