@@ -1,4 +1,5 @@
 using DevOpsTaskApp.Application.WorkItemDefinitions.Commands;
+using DevOpsTaskApp.Application.WorkItemDefinitions.Commands.UpdateWorkItemDefinition;
 using DevOpsTaskApp.Application.WorkItemDefinitions.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -28,14 +29,23 @@ namespace DevOpsTaskApp.WebAPI.Controllers
             return Ok(result);
         }
 
-
-
         [HttpPost]
         public async Task<IActionResult> Create(CreateWorkItemDefinitionCommand command, CancellationToken cancellationToken)
         {
             var id = await _mediator.Send(command, cancellationToken);
             return Ok(new { Id = id });
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, UpdateWorkItemDefinitionCommand command, CancellationToken cancellationToken)
+        {
+            if (id != command.Id)
+                return BadRequest("ID mismatch");
+
+            await _mediator.Send(command, cancellationToken);
+            return NoContent();
+        }
+
     }
 
 
