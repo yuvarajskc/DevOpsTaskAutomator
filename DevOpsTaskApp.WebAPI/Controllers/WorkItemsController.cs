@@ -15,12 +15,20 @@ namespace DevOpsTaskApp.WebAPI.Controllers
         {
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
+
         [HttpGet]
-        public async Task<IActionResult> Get(CancellationToken cancellationToken)
+        public async Task<IActionResult> Get([FromQuery] string? userStoryId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _mediator.Send(new GetWorkItemDefinitionsQuery(), cancellationToken);
+            var result = await _mediator.Send(new GetWorkItemDefinitionsQuery
+            {
+                UserStoryId = userStoryId,
+                Page = page,
+                PageSize = pageSize
+            });
             return Ok(result);
         }
+
+
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateWorkItemDefinitionCommand command, CancellationToken cancellationToken)

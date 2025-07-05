@@ -20,26 +20,38 @@ public class GetWorkItemDefinitionsQueryHandler : IRequestHandler<GetWorkItemDef
 
     public async Task<List<WorkItemDefinitionDto>> Handle(GetWorkItemDefinitionsQuery request, CancellationToken cancellationToken)
     {
-        if (_cache.TryGetValue(CacheKey, out List<WorkItemDefinitionDto> cachedResult))
+        var cacheKey = $"workitems_{request.UserStoryId ?? "all"}";
+
+        if (_cache.TryGetValue(cacheKey, out List<WorkItemDefinitionDto> cachedResult))
         {
             Console.WriteLine("✅ Fetched from cache");
             return cachedResult;
         }
 
-        var items = await _context.WorkItemDefinitions
-            .Select(x => new WorkItemDefinitionDto
-            {
-                Id = x.Id,
-                Title = x.Title,
-                Description = x.Description,
-                UserStoryId = x.UserStoryId,
-                AssignedTo = x.AssignedTo
-            })
-            .ToListAsync(cancellationToken);
+        var query = _context.WorkItemDefinitions
+            .AsNoTracking()
+            .AsQueryable();
 
-        _cache.Set(CacheKey, items, TimeSpan.FromMinutes(2)); // Optional expiry
+        if (!string.IsNullOrWhiteSpace(request.UserStoryId))
+        {
+            query = query.Where(w => w.UserStoryId == request.UserStoryId);
+        }
 
-        Console.WriteLine("📦 Fetched from DB and cached");
+        var items = await query
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(x => new WorkItemDefinitionDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    Description = x.Description,
+                    UserStoryId = x.UserStoryId,
+                    AssignedTo = x.AssignedTo
+                })
+                .ToListAsync(cancellationToken);
+
+        _cache.Set(cacheKey, items, TimeSpan.FromMinutes(2));
+        Console.WriteLine("📦 Cached filtered result");
 
         return items;
     }
