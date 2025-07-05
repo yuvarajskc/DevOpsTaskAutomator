@@ -1,6 +1,7 @@
 using System.Net;
 using FluentValidation;
 using System.Text.Json;
+using DevOpsTaskApp.Application.Common.Exceptions;
 
 namespace DevOpsTaskApp.WebAPI.Middleware;
 
@@ -28,6 +29,18 @@ public class ExceptionHandlingMiddleware
             {
                 message = "Validation failed",
                 errors = ex.Errors.Select(e => new { field = e.PropertyName, error = e.ErrorMessage })
+            };
+
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+        }
+        catch (NotFoundException ex)
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+            context.Response.ContentType = "application/json";
+
+            var response = new
+            {
+                message = ex.Message
             };
 
             await context.Response.WriteAsync(JsonSerializer.Serialize(response));

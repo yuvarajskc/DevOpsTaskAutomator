@@ -1,4 +1,5 @@
 using DevOpsTaskApp.Application.WorkItemDefinitions.Commands;
+using DevOpsTaskApp.Application.WorkItemDefinitions.Commands.DeleteWorkItemDefinition;
 using DevOpsTaskApp.Application.WorkItemDefinitions.Commands.UpdateWorkItemDefinition;
 using DevOpsTaskApp.Application.WorkItemDefinitions.Queries;
 using MediatR;
@@ -45,6 +46,14 @@ namespace DevOpsTaskApp.WebAPI.Controllers
             await _mediator.Send(command, cancellationToken);
             return NoContent();
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _mediator.Send(new DeleteWorkItemDefinitionCommand(id));
+            return NoContent();
+        }
+
 
     }
 
