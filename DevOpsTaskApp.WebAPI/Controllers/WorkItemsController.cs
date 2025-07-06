@@ -1,3 +1,4 @@
+using DevOpsTaskApp.Application.AzureDevOps.Commands.CreateAzureDevOpsTask;
 using DevOpsTaskApp.Application.WorkItemDefinitions.Commands;
 using DevOpsTaskApp.Application.WorkItemDefinitions.Commands.DeleteWorkItemDefinition;
 using DevOpsTaskApp.Application.WorkItemDefinitions.Commands.UpdateWorkItemDefinition;
@@ -54,6 +55,12 @@ namespace DevOpsTaskApp.WebAPI.Controllers
             return NoContent();
         }
 
+        [HttpPost("CreateAzureTask")]
+        public async Task<IActionResult> CreateAzureTask([FromBody] CreateAzureDevOpsTaskCommand command, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(command, cancellationToken);
+            return Ok(result);
+        }
 
     }
 

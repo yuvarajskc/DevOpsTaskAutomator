@@ -1,3 +1,4 @@
+using DevOpsTaskApp.Application.AzureDevOps.Application.Common.Models;
 using DevOpsTaskApp.Application.Common.Interfaces;
 using DevOpsTaskApp.Infrastructure.Persistence;
 using FluentValidation;
@@ -11,6 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -21,6 +23,8 @@ builder.Services.AddScoped<IApplicationDbContext>(provider =>
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(DevOpsTaskApp.Application.AssemblyReference).Assembly));
 
+builder.Services.Configure<AzureDevOpsSettings>(
+    builder.Configuration.GetSection("AzureDevOps"));
 builder.Services.AddMemoryCache();
 builder.Services.AddValidatorsFromAssembly(typeof(DevOpsTaskApp.Application.AssemblyReference).Assembly);
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
