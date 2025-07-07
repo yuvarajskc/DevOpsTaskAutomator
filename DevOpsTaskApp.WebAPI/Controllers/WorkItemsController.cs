@@ -62,6 +62,20 @@ namespace DevOpsTaskApp.WebAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPost("batch")]
+        public async Task<IActionResult> CreateBatch(List<CreateWorkItemDefinitionCommand> commands, CancellationToken cancellationToken)
+        {
+            var results = new List<int>();
+
+            foreach (var command in commands)
+            {
+                var id = await _mediator.Send(command, cancellationToken);
+                results.Add(id);
+            }
+
+            return Ok(results);
+        }
+
     }
 
 
