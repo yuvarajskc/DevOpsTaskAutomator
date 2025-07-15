@@ -30,6 +30,7 @@ builder.Services.AddValidatorsFromAssembly(typeof(DevOpsTaskApp.Application.Asse
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 //builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
+builder.Services.AddScoped<IAzureDevOpsService, DevOpsTaskApp.Infrastructure.Services.AzureDevOpsService>();
 
 var app = builder.Build();
 app.UseMiddleware<DevOpsTaskApp.WebAPI.Middleware.ExceptionHandlingMiddleware>();
