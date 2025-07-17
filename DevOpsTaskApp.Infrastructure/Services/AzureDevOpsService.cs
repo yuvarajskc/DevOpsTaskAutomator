@@ -1,8 +1,9 @@
-using System;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using DevOpsTaskApp.Application.AzureDevOps.Application.Common.Models;
 using DevOpsTaskApp.Application.Common.Interfaces;
+using DevOpsTaskApp.Application.Common.Models;
 using Microsoft.Extensions.Options;
 
 namespace DevOpsTaskApp.Infrastructure.Services;
@@ -18,21 +19,25 @@ public class AzureDevOpsService : IAzureDevOpsService
         _settings = options.Value;
     }
 
-    public async Task<string> CreateTaskAsync(string organization, string project, string title, string assignedTo, string iterationPath, string userStoryId, CancellationToken cancellationToken)
+    public async Task<string> CreateTaskAsync(string patToken, CreateAzureDevOpsTaskModel model, CancellationToken cancellationToken)
     {
         var patchDocument = new List<object>
         {
-            new { op = "add", path = "/fields/System.Title", value = title },
-            new { op = "add", path = "/fields/System.IterationPath", value = iterationPath },
-            new { op = "add", path = "/fields/System.AssignedTo", value = assignedTo },
-            new { op = "add", path = "/fields/System.Parent", value = userStoryId }
+            new { op = "add", path = "/fields/System.Title", value = model.Title },
+            new { op = "add", path = "/fields/System.IterationPath", value = model.IterationPath },
+            new { op = "add", path = "/fields/System.AssignedTo", value = model.AssignedTo },
+            new { op = "add", path = "/fields/System.Parent", value = model.UserStoryId }
         };
 
-        var url = $"{_settings.BaseUrl}{organization}/{project}/_apis/wit/workitems/$Task?api-version={_settings.ApiVersion}";
+        var url = $"{_settings.BaseUrl}{model.Organization}/{model.Project}/_apis/wit/workitems/$Task?api-version={_settings.ApiVersion}";
+
         var request = new HttpRequestMessage(HttpMethod.Post, url)
         {
             Content = new StringContent(JsonSerializer.Serialize(patchDocument), Encoding.UTF8, "application/json-patch+json")
         };
+
+        request.Headers.Authorization = new AuthenticationHeaderValue("Basic",
+            Convert.ToBase64String(Encoding.ASCII.GetBytes($":{patToken}")));
 
         var response = await _httpClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();

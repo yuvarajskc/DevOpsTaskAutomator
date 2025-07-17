@@ -11,4 +11,5 @@ public class CreateAzureDevOpsTaskCommand : IRequest<string>
     public string UserStoryId { get; set; } = default!;
     public string Title { get; set; } = default!;
     public string AssignedTo { get; set; } = default!;
+    public string PatToken { get; set; } = default!;
 }

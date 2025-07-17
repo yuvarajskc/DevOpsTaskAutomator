@@ -1,8 +1,9 @@
 using System;
+using DevOpsTaskApp.Application.Common.Models;
 
 namespace DevOpsTaskApp.Application.Common.Interfaces;
 
 public interface IAzureDevOpsService
 {
-    Task<string> CreateTaskAsync(string organization, string project, string title, string assignedTo, string iterationPath, string userStoryId, CancellationToken cancellationToken);
+    Task<string> CreateTaskAsync(string patToken, CreateAzureDevOpsTaskModel model, CancellationToken cancellationToken);
 }

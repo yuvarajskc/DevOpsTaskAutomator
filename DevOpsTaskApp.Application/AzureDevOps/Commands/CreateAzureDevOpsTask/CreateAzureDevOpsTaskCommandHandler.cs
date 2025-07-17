@@ -1,11 +1,6 @@
-using System;
-using System.Text;
-using System.Text.Json;
-using DevOpsTaskApp.Application.AzureDevOps.Application.Common.Models;
 using DevOpsTaskApp.Application.Common.Interfaces;
+using DevOpsTaskApp.Application.Common.Models;
 using MediatR;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace DevOpsTaskApp.Application.AzureDevOps.Commands.CreateAzureDevOpsTask;
 
@@ -20,14 +15,19 @@ public class CreateAzureDevOpsTaskCommandHandler : IRequestHandler<CreateAzureDe
 
     public async Task<string> Handle(CreateAzureDevOpsTaskCommand request, CancellationToken cancellationToken)
     {
-        return await _azureDevOpsService.CreateTaskAsync(
-            request.Organization,
-            request.Project,
-            request.Title,
-            request.AssignedTo,
-            request.IterationPath,
-            request.UserStoryId,
-            cancellationToken);
+        var taskModel = new CreateAzureDevOpsTaskModel
+        {
+            Organization = request.Organization,
+            Project = request.Project,
+            Title = request.Title,
+            AssignedTo = request.AssignedTo,
+            IterationPath = request.IterationPath,
+            UserStoryId = request.UserStoryId
+        };
+
+        var response = await _azureDevOpsService.CreateTaskAsync(request.PatToken, taskModel, cancellationToken);
+        return response;
+
     }
 }
 
