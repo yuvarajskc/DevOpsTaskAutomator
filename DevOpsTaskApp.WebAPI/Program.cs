@@ -27,6 +27,7 @@ builder.Services.Configure<AzureDevOpsSettings>(
     builder.Configuration.GetSection("AzureDevOps"));
 builder.Services.AddMemoryCache();
 builder.Services.AddValidatorsFromAssembly(typeof(DevOpsTaskApp.Application.AssemblyReference).Assembly);
+builder.Services.AddAutoMapper(typeof(DevOpsTaskApp.Application.AssemblyReference).Assembly);
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 //builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
