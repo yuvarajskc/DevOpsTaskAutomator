@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DevOpsTaskApp.WebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [ApiExplorerSettings(GroupName = "v1")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Produces("application/json")]
     public class WorkItemsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -31,6 +33,13 @@ namespace DevOpsTaskApp.WebAPI.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Creates a new work item definition.
+        /// This endpoint accepts a CreateWorkItemDefinitionCommand and returns the ID of the created work item
+        /// </summary>
+        /// <param name="command">The command containing the details of the work item to create.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Create(CreateWorkItemDefinitionCommand command, CancellationToken cancellationToken)
         {
