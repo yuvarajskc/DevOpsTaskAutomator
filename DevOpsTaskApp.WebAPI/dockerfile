@@ -1,0 +1,33 @@
+# Use the official ASP.NET runtime image as a base
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+WORKDIR /app
+EXPOSE 80
+
+# Use the .NET SDK image for build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+# Copy and restore all projects
+COPY ["DevOpsTaskApp.WebAPI/DevOpsTaskApp.WebAPI.csproj", "DevOpsTaskApp.WebAPI/"]
+COPY ["DevOpsTaskApp.Application/DevOpsTaskApp.Application.csproj", "DevOpsTaskApp.Application/"]
+COPY ["DevOpsTaskApp.Domain/DevOpsTaskApp.Domain.csproj", "DevOpsTaskApp.Domain/"]
+COPY ["DevOpsTaskApp.Infrastructure/DevOpsTaskApp.Infrastructure.csproj", "DevOpsTaskApp.Infrastructure/"]
+
+RUN dotnet restore "DevOpsTaskApp.WebAPI/DevOpsTaskApp.WebAPI.csproj"
+
+# Copy the rest of the code
+COPY . .
+
+# Build the project
+WORKDIR "/src/DevOpsTaskApp.WebAPI"
+RUN dotnet build "DevOpsTaskApp.WebAPI.csproj" -c Release -o /app/build
+
+# Publish
+FROM build AS publish
+RUN dotnet publish "DevOpsTaskApp.WebAPI.csproj" -c Release -o /app/publish
+
+# Final stage: runtime container
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "DevOpsTaskApp.WebAPI.dll"]
