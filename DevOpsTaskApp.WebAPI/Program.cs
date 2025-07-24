@@ -47,6 +47,12 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBeh
 builder.Services.AddScoped<IAzureDevOpsService, DevOpsTaskApp.Infrastructure.Services.AzureDevOpsService>();
 
 var app = builder.Build();
+// Apply EF Core migrations automatically
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();  // ✅ Applies any pending migrations
+}
 app.UseMiddleware<DevOpsTaskApp.WebAPI.Middleware.ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
